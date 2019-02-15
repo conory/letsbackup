@@ -4,17 +4,18 @@ DB_HOST='localhost'
 DB_USER='root'
 DB_PASSWORD='[Config - root DB password]'
 REMOTE_BUCKET='[Config - rclone remote name]'
+REMOTE_EXPIRE_MONTHS=24
+LOCAL_EXPIRE_DAYS=3
 LETSBACKUP_DIR=~/.letsbackup
-BACKUP_EXPIRES_MONTHS=24
 name_dir_file=file
 name_dir_db=DB
-((BACKUP_EXPIRES_MONTHS++))
+((REMOTE_EXPIRE_MONTHS++))
 
 # set date
 date_month=`date +%Y%m`
 date_time=`date +%Y%m%d%H%M%S`
-date_previous_month=`date +%Y%m -d "1 month ago"`
-date_expires_month=`date +%Y%m -d "$BACKUP_EXPIRES_MONTHS month ago"`
+date_last_month=`date +%Y%m -d "2 month ago"`
+date_expire_month=`date +%Y%m -d "$REMOTE_EXPIRE_MONTHS month ago"`
 
 # set directory
 dir_storage=$LETSBACKUP_DIR/storage
@@ -123,21 +124,21 @@ function backup
 	msg "Uploading to remote storage \n"
 	rclone copy $dir_storage $REMOTE_BUCKET:$REMOTE_BUCKET
 	
-	# remove DB backup because it's full backup
-	rm -rf $dir_backup_db
-	
-	# remove file backup of previous month at local
-	if [ -d $dir_storage/$date_previous_month ]; then
-		msg "Removing backup of previous month at local ..."
-		rm -rf $dir_storage/$date_previous_month
-		msg "completed"
-	fi
+	# delete expired backup at local
+	find $dir_storage -mtime +$LOCAL_EXPIRE_DAYS -type f | xargs rm
 	
 	# delete expired backup at remote storage
-	if [ -d $dir_snap/$date_expires_month ]; then
+	if [ -d $dir_snap/$date_expire_month ]; then
 		msg "Deleting expired backup at remote storage \n"
-		rclone delete $REMOTE_BUCKET:$REMOTE_BUCKET/$date_expires_month
-		rm -rf $dir_snap/$date_expires_month
+		rclone delete $REMOTE_BUCKET:$REMOTE_BUCKET/$date_expire_month
+		rm -rf $dir_snap/$date_expire_month
+	fi
+	
+	# remove backup directory of last month at local
+	if [ -d $dir_storage/$date_last_month ]; then
+		msg "Removing backup directory of last month at local ..."
+		rm -rf $dir_storage/$date_last_month
+		msg "completed"
 	fi
 	
 	# end
