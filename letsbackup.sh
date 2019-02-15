@@ -13,6 +13,7 @@ name_dir_db=DB
 # set date
 date_month=`date +%Y%m`
 date_time=`date +%Y%m%d%H%M%S`
+date_previous_month=`date +%Y%m -d "1 month ago"`
 date_expires_month=`date +%Y%m -d "$BACKUP_EXPIRES_MONTHS month ago"`
 
 # set directory
@@ -105,17 +106,14 @@ function _backupDB
 }
 
 function backup
-{	
-	if [ -d $dir_backuping ]; then
-		rm -rf $dir_backuping
-	fi
-	
+{
 	# backup
 	msg "Initialization completed. \n"
 	_backupFile home /home
 	_backupFile log /var/log
 	_backupDB
 	
+	# check
 	if [ ! -d $dir_backuping ]; then
 		msg "\e[31mBackup failed!\e[0m \n"
 		return
@@ -125,15 +123,22 @@ function backup
 	msg "Uploading to remote storage \n"
 	rclone copy $dir_backuping $REMOTE_BUCKET:$REMOTE_BUCKET
 	
-	# delete expired backup at remote storage
-	msg "Deleting expired backup at remote storage \n"
-	rclone delete $REMOTE_BUCKET:$REMOTE_BUCKET/$date_expires_month
-	rm -rf $LETSBACKUP_DIR/snap/$date_expires_month
+	# remove DB backup because it's full backup
+	rm -rf $dir_db
 	
-	# remove backup at local
-	msg "Removing backup at local ..."
-	rm -rf $dir_backuping
-	msg "completed"
+	# remove file backup of previous month at local
+	if [ -d $dir_backuping/$date_previous_month ]; then
+		msg "Removing backup of previous month at local ..."
+		rm -rf $dir_backuping/$date_previous_month
+		msg "completed"
+	fi
+	
+	# delete expired backup at remote storage
+	if [ -d $LETSBACKUP_DIR/snap/$date_expires_month ]; then
+		msg "Deleting expired backup at remote storage \n"
+		rclone delete $REMOTE_BUCKET:$REMOTE_BUCKET/$date_expires_month
+		rm -rf $LETSBACKUP_DIR/snap/$date_expires_month
+	fi
 	
 	# end
 	msg "Backup completed! \n"
