@@ -17,10 +17,10 @@ date_previous_month=`date +%Y%m -d "1 month ago"`
 date_expires_month=`date +%Y%m -d "$BACKUP_EXPIRES_MONTHS month ago"`
 
 # set directory
-dir_backuping=$LETSBACKUP_DIR/backuping
-dir_snap=$LETSBACKUP_DIR/snap/$date_month
-dir_file=$dir_backuping/$date_month/$name_dir_file
-dir_db=$dir_backuping/$date_month/$name_dir_db
+dir_storage=$LETSBACKUP_DIR/storage
+dir_snap=$LETSBACKUP_DIR/snap
+dir_backup_file=$dir_storage/$date_month/$name_dir_file
+dir_backup_db=$dir_storage/$date_month/$name_dir_db
 
 function makeDirectory
 {
@@ -41,8 +41,8 @@ function msg
 
 function _backupFile
 {
-	local _dir_file=$dir_file/$1
-	local _dir_snap=$dir_snap/$1
+	local _dir_file=$dir_backup_file/$1
+	local _dir_snap=$dir_snap/$date_month/$1
 	local _file_snap=$_dir_snap/$date_time.snap
 	
 	# check already snap
@@ -89,7 +89,7 @@ function _backupDB
 	fi
 	
 	for db in $db_list; do
-		local _dir_db=$dir_db/$db
+		local _dir_db=$dir_backup_db/$db
 		
 		# making DB directory
 		makeDirectory $_dir_db
@@ -114,30 +114,30 @@ function backup
 	_backupDB
 	
 	# check
-	if [ ! -d $dir_backuping ]; then
+	if [ ! -d $dir_storage ]; then
 		msg "\e[31mBackup failed!\e[0m \n"
 		return
 	fi
 	
 	# upload to remote storage
 	msg "Uploading to remote storage \n"
-	rclone copy $dir_backuping $REMOTE_BUCKET:$REMOTE_BUCKET
+	rclone copy $dir_storage $REMOTE_BUCKET:$REMOTE_BUCKET
 	
 	# remove DB backup because it's full backup
-	rm -rf $dir_db
+	rm -rf $dir_backup_db
 	
 	# remove file backup of previous month at local
-	if [ -d $dir_backuping/$date_previous_month ]; then
+	if [ -d $dir_storage/$date_previous_month ]; then
 		msg "Removing backup of previous month at local ..."
-		rm -rf $dir_backuping/$date_previous_month
+		rm -rf $dir_storage/$date_previous_month
 		msg "completed"
 	fi
 	
 	# delete expired backup at remote storage
-	if [ -d $LETSBACKUP_DIR/snap/$date_expires_month ]; then
+	if [ -d $dir_snap/$date_expires_month ]; then
 		msg "Deleting expired backup at remote storage \n"
 		rclone delete $REMOTE_BUCKET:$REMOTE_BUCKET/$date_expires_month
-		rm -rf $LETSBACKUP_DIR/snap/$date_expires_month
+		rm -rf $dir_snap/$date_expires_month
 	fi
 	
 	# end
