@@ -141,20 +141,33 @@ function backup
 
 function restore
 {
-	local backup_files=`find $1 -maxdepth 1 -type f -name '*.tgz' | sort`
-	if [ -z "$backup_files" ]; then
-		msg "\e[31mtgz backup files not exist in the path\e[0m \n"
-		return
-	fi
-	if [ -d $1/restore ]; then
-		msg "already exist restored files. \n"
-		return
-	fi
-	mkdir -p $1/restore
+	local local_path="$1"
+	local remote_path="$2"
+	local restore_path=$local_path/restore
 	
+	# get backup files from remote storage
+	if [ ! -z $remote_path ]; then
+		msg "getting backup files from remote storage. \n"
+		rm -rf $local_path && mkdir -p $local_path
+		rclone copy $REMOTE_BUCKET:$REMOTE_BUCKET/$remote_path $local_path
+	fi
+	
+	# check
+	local backup_files=`find $local_path -maxdepth 1 -type f -name '*.tgz' | sort`
+	if [ -z "$backup_files" ]; then
+		if [ ! -z $remote_path ]; then
+			msg "Download completed! \n"
+		else
+			msg "\e[31mtgz backup files not exist in the path\e[0m \n"
+		fi
+		return
+	fi
+	rm -rf $restore_path && mkdir -p $restore_path
+	
+	# Restoring
 	msg "Restoring ... \n"
 	for tgz_file in $backup_files; do
-		tar -zxGf $tgz_file -C $1/restore
+		tar -zxGf $tgz_file -C $restore_path
 	done
 	
 	# end
@@ -164,6 +177,7 @@ function restore
 # set parameters
 command="${*:$OPTIND:1}"
 arg1="${*:$OPTIND+1:1}"
+arg2="${*:$OPTIND+2:1}"
 let argnum=$#-$OPTIND
 
 # start
@@ -177,6 +191,6 @@ case $command in
 			echo -e "path to tgz backup files is not set."
 			exit 1
 		fi
-		restore $arg1
+		restore $arg1 $arg2
 	;;
 esac
