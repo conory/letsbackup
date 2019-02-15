@@ -142,11 +142,14 @@ function backup
 function restore
 {
 	local backup_files=`find $1 -maxdepth 1 -type f -name '*.tgz' | sort`
-	if [ -z $backup_files ]; then
+	if [ -z "$backup_files" ]; then
 		msg "\e[31mtgz backup files not exist in the path\e[0m \n"
 		return
 	fi
-	
+	if [ -d $1/restore ]; then
+		msg "already exist restored files. \n"
+		return
+	fi
 	mkdir -p $1/restore
 	
 	msg "Restoring ... \n"
