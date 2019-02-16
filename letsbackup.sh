@@ -170,7 +170,7 @@ function restore
 	fi
 	rm -rf $restore_path && mkdir -p $restore_path
 	
-	# Restoring
+	# restoring
 	msg "Restoring ... \n"
 	for tgz_file in $backup_files; do
 		tar -zxGf $tgz_file -C $restore_path
@@ -187,7 +187,7 @@ arg2="${*:$OPTIND+2:1}"
 let argnum=$#-$OPTIND
 
 # start
-msg "Let's backup! script ver 0.3 \n"
+msg "Let's backup! script ver 0.4 \n"
 case $command in
 	backup)
 		backup
