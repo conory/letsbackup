@@ -75,7 +75,7 @@ function _backupFile
 		--exclude=files/member_extra_info/new_message_flags \
 		--exclude=files/member_extra_info/point \
 		--exclude=files/tmp \
-	2>&1 | grep -v "tar: Removing leading"
+	>/dev/null 2>&1
 	
 	msg 'completed'
 }
@@ -125,7 +125,7 @@ function backup
 	rclone copy $dir_storage $REMOTE_BUCKET:$REMOTE_BUCKET
 	
 	# delete expired backup at local
-	find $dir_storage -mtime +$LOCAL_EXPIRE_DAYS -type f | xargs rm
+	find $dir_storage -mtime +$LOCAL_EXPIRE_DAYS -type f | xargs rm >/dev/null 2>&1
 	
 	# delete expired backup at remote storage
 	if [ -d $dir_snap/$date_expire_month ]; then
