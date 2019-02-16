@@ -153,7 +153,7 @@ function restore
 	
 	# get backup files from remote storage
 	if [ ! -z $remote_path ]; then
-		msg "getting backup files from remote storage. \n"
+		msg "Getting backup files from remote storage. \n"
 		rm -rf $local_path && mkdir -p $local_path
 		rclone copy $REMOTE_BUCKET:$REMOTE_BUCKET/$remote_path $local_path
 	fi
