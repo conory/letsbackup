@@ -10,11 +10,11 @@ LETSBACKUP_DIR=~/.letsbackup
 name_dir_file=file
 name_dir_db=DB
 ((REMOTE_EXPIRE_MONTHS++))
+((LOCAL_EXPIRE_DAYS--))
 
 # set date
 date_month=`date +%Y%m`
 date_time=`date +%Y%m%d%H%M%S`
-date_last_month=`date +%Y%m -d "2 month ago"`
 date_expire_month=`date +%Y%m -d "$REMOTE_EXPIRE_MONTHS month ago"`
 
 # set directory
@@ -125,20 +125,13 @@ function backup
 	rclone copy $dir_storage $REMOTE_BUCKET:$REMOTE_BUCKET
 	
 	# delete expired backup at local
-	find $dir_storage -mtime +$LOCAL_EXPIRE_DAYS -type f | xargs rm >/dev/null 2>&1
+	find $dir_storage -mindepth 1 -mtime +$LOCAL_EXPIRE_DAYS | xargs rm -rf
 	
 	# delete expired backup at remote storage
 	if [ -d $dir_snap/$date_expire_month ]; then
 		msg "Deleting expired backup at remote storage \n"
 		rclone delete $REMOTE_BUCKET:$REMOTE_BUCKET/$date_expire_month
 		rm -rf $dir_snap/$date_expire_month
-	fi
-	
-	# remove backup directory of last month at local
-	if [ -d $dir_storage/$date_last_month ]; then
-		msg "Removing backup directory of last month at local ..."
-		rm -rf $dir_storage/$date_last_month
-		msg "completed"
 	fi
 	
 	# end
