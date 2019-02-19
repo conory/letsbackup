@@ -9,7 +9,7 @@ top line of letsbackup.sh.
 - **DB_USER** - DB user information for DB backup (default : root)
 - **DB_PASSWORD** - password of DB user
 - **REMOTE_BUCKET** - must be the same 'remote name of rclone config' and 'bucket name of remote storage'
-- **REMOTE_EXPIRE_MONTHS** - store backup in remote storage for the months (default : 24)
+- **REMOTE_EXPIRE_MONTHS** - store backup in remote storage for the months (default : 12)
 - **LOCAL_EXPIRE_DAYS** - store backup in local for the days (default : 3)
 
 ## Usage
