@@ -124,6 +124,9 @@ function backup
 	msg "Uploading to remote storage \n"
 	rclone copy $dir_storage $REMOTE_BUCKET:$REMOTE_BUCKET
 	
+	# update timestamps of working directory for prevent deleted
+	find $dir_storage/$date_month -type d | xargs touch
+	
 	# delete expired backup at local
 	find $dir_storage -mindepth 1 -mtime +$LOCAL_EXPIRE_DAYS | xargs rm -rf
 	
