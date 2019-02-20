@@ -115,7 +115,7 @@ function backup
 	_backupDB
 	
 	# check
-	if [ ! -d $dir_storage ]; then
+	if [ ! -d $dir_backup_file ] && [ ! -d $dir_backup_db ]; then
 		msg "\e[31mBackup failed!\e[0m \n"
 		return
 	fi
