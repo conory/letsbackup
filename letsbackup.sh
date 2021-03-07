@@ -15,7 +15,7 @@ function backup
 	
 	# upload to remote storage
 	msg "Uploading to remote storage \n"
-	rclone copy $dir_storage $rclone_remote_name:$rclone_remote_name --progress
+	rclone copy $dir_storage $rclone_remote_name:$rclone_remote_name --progress --transfers 1 --buffer-size 0M
 	
 	# update timestamps of working directory for prevent deleted
 	find $dir_storage/$date_month -type d | xargs touch
