@@ -201,7 +201,8 @@ EOF
 	fi
 	echo ""
 	cat <<EOF
-Enter the name of rclone remote that will be used for remote backup.
+Enter the remote name of rclone config that will be used for remote backup.
+Important: Must be the same "remote name of rclone config" and "bucket name of remote storage"
 EOF
 	read -p "string> " rclone_remote_name
 	if [[ -z $rclone_remote_name ]]; then
