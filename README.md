@@ -1,7 +1,8 @@
 # Let's Backup!
-web service backup script using tar incremental and rclone for remote backup.
-
-support backup for /home, /var/log directory and MYSQL DB.
+Web service backup script using tar incremental and rclone for remote backup. supports backup for the following:
+* /home
+* /var/log
+* MySQL Databases (with mysqldump)
 
 ## Usage
 1. install [rclone](https://github.com/ncw/rclone).
@@ -20,12 +21,12 @@ $ ./letsbackup.sh backup
 ```
 $ ./letsbackup.sh restore [path with tgz backup files]
 ```
-restored in ``[path with tgz backup files] /restore`` path.
+restored in ``[path with tgz backup files]/restore`` path.
 ### restore after get backup files at remote
 ```
 $ ./letsbackup.sh restore [download path] [remote path with tgz backup files]
 ```
-restored in ``[download path] /restore`` path, if only exist tgz backup files in the remote path.
+restored in ``[download path]/restore`` path, if only exist tgz backup files in the remote path.
 
 ## License
 MIT License
