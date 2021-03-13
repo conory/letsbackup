@@ -26,7 +26,7 @@ function backup
 	# delete expired backup at remote storage
 	if [[ -d $dir_snap/$date_expire_month ]]; then
 		msg "Deleting expired backup at remote storage \n"
-		rclone delete $rclone_remote_name:$rclone_remote_name/$date_expire_month
+		rclone delete $rclone_remote_name:$rclone_remote_name/$date_expire_month --progress
 		rm -rf $dir_snap/$date_expire_month
 	fi
 	
@@ -41,21 +41,26 @@ function restore
 	local restore_path=$local_path/restore
 	
 	# get backup files from remote storage
-	if [[ ! -z $remote_path ]]; then
+	if [[ -n $remote_path ]]; then
+		if compgen -G "$local_path/*" > /dev/null; then
+			echo -e "\e[31mWarning : Existing files in the target path will be deleted if continue.\e[0m"
+			read -p "Y/n> " _whether
+			if [[ $_whether != "Y" ]]; then
+				return
+			fi
+		fi
 		msg "Getting backup files from remote storage. \n"
 		rm -rf $local_path && mkdir -p $local_path
-		rclone copy $rclone_remote_name:$rclone_remote_name/$remote_path $local_path
+		rclone copy $rclone_remote_name:$rclone_remote_name$remote_path $local_path --progress
 	fi
 	
 	# check
-	local backup_files=`find $local_path -maxdepth 1 -type f -name '*.tgz' | sort`
+	local backup_files=`find $local_path -maxdepth 1 -type f -name "*.tgz" | sort`
 	if [[ -z $backup_files ]]; then
-		if [[ ! -z $remote_path ]]; then
-			msg "Download completed! \n"
-		else
-			msg "\e[31mtgz backup files not exist in the path\e[0m \n"
-		fi
+		msg "\e[31mtgz backup files not exists in the target path\e[0m \n"
 		return
+	elif [[ -n $remote_path ]]; then
+		msg "Download completed! \n"
 	fi
 	rm -rf $restore_path && mkdir -p $restore_path
 	
@@ -86,8 +91,10 @@ function _backupFile
 		makeDirectory $_dir_snap
 	# copy previous snap
 	else
-		local previous_snap=`find $_dir_snap -maxdepth 1 -type f -name '*.snap' | sort | tail -n 1`
-		cp $previous_snap $_file_snap
+		local previous_snap=`find $_dir_snap -maxdepth 1 -type f -name "*.snap" | sort | tail -n 1`
+		if [[ -n $previous_snap ]]; then
+			cp $previous_snap $_file_snap
+		fi
 	fi
 	
 	# making file directory
@@ -104,9 +111,9 @@ function _backupFile
 		--exclude=files/member_extra_info/new_message_flags \
 		--exclude=files/member_extra_info/point \
 		--exclude=files/tmp \
-	>/dev/null 2>&1
+	> /dev/null 2>&1
 	
-	msg 'completed'
+	msg "completed"
 }
 
 function _backupMysql
@@ -121,7 +128,7 @@ function _backupMysql
 		msg "\e[31mCannot access or no database\e[0m \n"
 		return
 	fi
-	 
+	
 	for database_name in $database_list; do
 		local _dir_database=$dir_backup_mysql/$database_name
 		
@@ -131,11 +138,7 @@ function _backupMysql
 		# exporting
 		msg "Exporting $database_name database to file ..."
 		mysqldump $mysql_auth_option --opt --single-transaction -e $database_name | gzip > "$_dir_database/$database_name.$date_time.sql.gz"
-		if [[ $? != 0 ]]; then
-			msg 'failed'
-		else
-			msg 'completed'
-		fi
+		msg "completed"
 	done
 }
 
