@@ -43,7 +43,7 @@ function restore
 	# get backup files from remote storage
 	if [[ -n $remote_path ]]; then
 		if compgen -G "$local_path/*" > /dev/null; then
-			echo -e "\e[31mWarning : Existing files in the target path will be deleted if continue.\e[0m"
+			echo -e "\e[31mWarning: Existing files in the target path will be deleted if continue.\e[0m"
 			read -p "Y/n> " _whether
 			if [[ $_whether != "Y" ]]; then
 				return
@@ -188,8 +188,8 @@ EOF
 	esac
 	if [[ $mysql_auth_type == "password" ]]; then
 		echo ""
-		read -e -p "mysql user : " -i "root" mysql_user
-		read -s -p "mysql password : " mysql_password
+		read -e -p "mysql user: " -i "root" mysql_user
+		read -s -p "mysql password: " mysql_password
 		echo ""
 		if [[ -z $mysql_user ]]; then
 			echo -e "\e[31mThere is no input.\e[0m"

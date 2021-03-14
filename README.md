@@ -24,9 +24,9 @@ $ ./letsbackup.sh restore [path with tgz backup files]
 restored in ``[path with tgz backup files]/restore`` path.
 ### restore after get backup files at remote
 ```
-$ ./letsbackup.sh restore [download path] [remote path with tgz backup files]
+$ ./letsbackup.sh restore [new download path] [remote path with tgz backup files]
 ```
-restored in ``[download path]/restore`` path, if only exist tgz backup files in the remote path.
+restored in ``[new download path]/restore`` path, if only exist tgz backup files in the remote path.
 
 ## License
 MIT License
