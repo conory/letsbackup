@@ -230,7 +230,10 @@ EOF
 mysql_auth_type=$mysql_auth_type
 mysql_host=localhost
 mysql_user=$mysql_user
-mysql_password=$mysql_password
+mysql_password=\$(cat <<'PASSWORD'
+$mysql_password
+PASSWORD
+)
 rclone_remote_name=$rclone_remote_name
 remote_expire_months=${remote_expire_months:-12}
 local_expire_days=${local_expire_days:-3}
