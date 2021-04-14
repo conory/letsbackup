@@ -92,7 +92,7 @@ function _backupFile
 	
 	# making snap directory
 	if [[ ! -d $_dir_snap ]]; then
-		makeDirectory $_dir_snap
+		mkdir -p $_dir_snap
 	# copy previous snap
 	else
 		local previous_snap=`find $_dir_snap -maxdepth 1 -type f -name "*.snap" | sort | tail -n 1`
@@ -102,7 +102,7 @@ function _backupFile
 	fi
 	
 	# making file directory
-	makeDirectory $_dir_file
+	mkdir -p $_dir_file
 	
 	# packing
 	msg "Packing file $1 ..."
@@ -137,19 +137,13 @@ function _backupMysql
 		local _dir_database=$dir_backup_mysql/$database_name
 		
 		# making database directory
-		makeDirectory $_dir_database
+		mkdir -p $_dir_database
 		
 		# exporting
 		msg "Exporting $database_name database to file ..."
-		mysqldump $mysql_auth_option --opt --single-transaction -e $database_name | gzip > "$_dir_database/$database_name.$date_time.sql.gz"
+		mysqldump $mysql_auth_option --opt --single-transaction -e $database_name | gzip > $_dir_database/$database_name.$date_time.sql.gz
 		msg "completed"
 	done
-}
-
-function makeDirectory
-{
-	mkdir -p $1
-	chmod 700 $1
 }
 
 function msg
@@ -254,6 +248,7 @@ date_time=`date +%Y%m%d%H%M%S`
 date_expire_month=`date +%Y%m -d "$remote_expire_months month ago"`
 
 # set directory
+mkdir -p $letsbackup_path && chmod 700 $letsbackup_path
 dir_storage=$letsbackup_path/storage
 dir_snap=$letsbackup_path/snap
 dir_backup_file=$dir_storage/$date_month/file
