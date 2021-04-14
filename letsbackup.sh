@@ -234,6 +234,7 @@ remote_expire_months=${remote_expire_months:-12}
 local_expire_days=${local_expire_days:-3}
 letsbackup_path=~/.letsbackup
 EOF
+	chmod 0600 $config_file
 	echo "Done. Please run it again."
 	exit
 fi
