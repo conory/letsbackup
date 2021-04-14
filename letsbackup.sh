@@ -3,8 +3,10 @@ function backup
 {
 	# backup
 	msg "Initialization completed. \n"
-	_backupFile home /home
-	_backupFile log /var/log
+	for target_path in `find /home -mindepth 1 -maxdepth 1 -type d`; do
+		_backupFile $target_path
+	done
+	_backupFile /var/log
 	_backupMysql
 	
 	# check
@@ -79,10 +81,12 @@ function _backupFile
 	local _dir_file=$dir_backup_file/$1
 	local _dir_snap=$dir_snap/$date_month/$1
 	local _file_snap=$_dir_snap/$date_time.snap
+	local backup_file_name=${1//\//.}
+	backup_file_name=${backup_file_name:1}
 	
 	# check already snap
 	if [[ -f $_file_snap ]]; then
-		msg "Skipping already exist backup of $2 \n"
+		msg "Skipping already exist backup of $1 \n"
 		return
 	fi
 	
@@ -101,8 +105,8 @@ function _backupFile
 	makeDirectory $_dir_file
 	
 	# packing
-	msg "Packing file $2 ..."
-	tar -g $_file_snap -zcf $_dir_file/$1.$date_time.tgz $2 --atime-preserve=system \
+	msg "Packing file $1 ..."
+	tar -g $_file_snap -zcf $_dir_file/$backup_file_name.$date_time.tgz $1 --atime-preserve=system \
 		--exclude=$letsbackup_path \
 		--exclude=files/cache \
 		--exclude=files/supercache \
