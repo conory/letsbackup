@@ -1,7 +1,7 @@
 # Let's Backup!
 Web service backup script using tar incremental and rclone for remote backup. supports backup for the following:
-* /home
-* /var/log
+* /home/\<directories\>
+* /var/log/\<directories and files\>
 * MySQL Databases (with mysqldump)
 
 ## Usage
