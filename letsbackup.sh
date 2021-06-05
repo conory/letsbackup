@@ -106,7 +106,7 @@ function _backupFile
 	
 	# packing
 	msg "Packing file $1 ..."
-	tar -g $_file_snap -zcf $_dir_file/$backup_file_name.$date_time.tgz $1 --atime-preserve=system \
+	tar -g $_file_snap -zcf $_dir_file/$backup_file_name.$date_time.tgz --atime-preserve=system \
 		--exclude=$letsbackup_path \
 		--exclude=files/cache \
 		--exclude=files/supercache \
@@ -115,7 +115,7 @@ function _backupFile
 		--exclude=files/member_extra_info/new_message_flags \
 		--exclude=files/member_extra_info/point \
 		--exclude=files/tmp \
-	> /dev/null 2>&1
+	$1 > /dev/null 2>&1
 	
 	msg "completed"
 }
