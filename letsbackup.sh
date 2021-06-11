@@ -108,6 +108,7 @@ function _backupFile
 	msg "Packing file $1 ..."
 	tar -g $_file_snap -zcf $_dir_file/$backup_file_name.$date_time.tgz --atime-preserve=system \
 		--exclude=$letsbackup_path \
+		--exclude=files/attach/chunks \
 		--exclude=files/cache \
 		--exclude=files/supercache \
 		--exclude=files/thumbnails \
