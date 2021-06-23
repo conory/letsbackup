@@ -19,7 +19,7 @@ function backup
 	msg "Uploading to remote storage \n"
 	rclone copy $dir_storage $rclone_remote_prefix --progress --transfers 1 --buffer-size 0M
 	
-	# update timestamps of working directory for prevent deleted
+	# update timestamps of working directories for prevent deleted
 	find $dir_storage/$date_month -type d | xargs touch
 	
 	# delete expired backups on local storage
