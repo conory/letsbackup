@@ -159,7 +159,7 @@ function msg
 }
 
 
-msg "Let's backup! script ver 1.0.2 \n"
+msg "Let's backup! script ver 1.1.0 \n"
 
 command=${*:$OPTIND:1}
 arg1=${*:$OPTIND+1:1}
