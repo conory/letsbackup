@@ -22,12 +22,12 @@ function backup
 	# update timestamps of working directories for prevent deleted
 	find $dir_storage/$date_month -type d | xargs touch
 	
-	# delete expired backups on local storage
+	# delete expired backup files on local storage
 	find $dir_storage -mindepth 1 -mtime +$local_expire_days | xargs rm -rf
 	
-	# delete expired backups on remote storage
+	# delete expired backup files on remote storage
 	if [[ -d $dir_snap/$date_expire_month ]]; then
-		msg "Deleting expired backups on remote storage \n"
+		msg "Deleting expired backup files on remote storage \n"
 		rclone delete $rclone_remote_prefix/$date_expire_month --progress > /dev/null 2>&1
 		rm -rf $dir_snap/$date_expire_month
 	fi
