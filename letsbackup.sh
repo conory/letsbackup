@@ -17,7 +17,7 @@ function backup
 	
 	# upload to remote storage
 	msg "Uploading to remote storage \n"
-	rclone copy $dir_storage $rclone_remote_name:$rclone_remote_name --progress --transfers 1 --buffer-size 0M
+	rclone copy $dir_storage $rclone_remote_prefix --progress --transfers 1 --buffer-size 0M
 	
 	# update timestamps of working directory for prevent deleted
 	find $dir_storage/$date_month -type d | xargs touch
@@ -28,7 +28,7 @@ function backup
 	# delete expired backup at remote storage
 	if [[ -d $dir_snap/$date_expire_month ]]; then
 		msg "Deleting expired backup at remote storage \n"
-		rclone delete $rclone_remote_name:$rclone_remote_name/$date_expire_month --progress
+		rclone delete $rclone_remote_prefix/$date_expire_month --progress
 		rm -rf $dir_snap/$date_expire_month
 	fi
 	
@@ -53,7 +53,7 @@ function restore
 		fi
 		msg "Getting backup files from remote storage. \n"
 		rm -rf $local_path && mkdir -p $local_path
-		rclone copy $rclone_remote_name:$rclone_remote_name$remote_path $local_path --progress
+		rclone copy $rclone_remote_prefix$remote_path $local_path --progress
 	fi
 	
 	# check
@@ -211,6 +211,12 @@ EOF
 		echo -e "\e[31m\nThere is no input.\e[0m"
 		exit
 	fi
+	rclone_remote_prefix=$rclone_remote_name:$rclone_remote_name
+	rclone_remote_prefix_as='$rclone_remote_name:$rclone_remote_name'
+	if ! rclone lsf $rclone_remote_prefix > /dev/null 2>&1; then
+		rclone_remote_prefix=$rclone_remote_name:
+		rclone_remote_prefix_as='$rclone_remote_name:'
+	fi
 	echo ""
 	cat <<EOF
 Backup files stored on remote storage will be deleted after the number of months.
@@ -231,6 +237,7 @@ mysql_host='localhost'
 mysql_user='${mysql_user//\'/\'\\\'\'}'
 mysql_password='${mysql_password//\'/\'\\\'\'}'
 rclone_remote_name='${rclone_remote_name//\'/\'\\\'\'}'
+rclone_remote_prefix=$rclone_remote_prefix_as
 remote_expire_months=${remote_expire_months:-12}
 local_expire_days=${local_expire_days:-3}
 letsbackup_path=~/.letsbackup
