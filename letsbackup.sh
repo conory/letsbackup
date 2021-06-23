@@ -22,13 +22,13 @@ function backup
 	# update timestamps of working directory for prevent deleted
 	find $dir_storage/$date_month -type d | xargs touch
 	
-	# delete expired backup at local
+	# delete expired backups on local storage
 	find $dir_storage -mindepth 1 -mtime +$local_expire_days | xargs rm -rf
 	
-	# delete expired backup at remote storage
+	# delete expired backups on remote storage
 	if [[ -d $dir_snap/$date_expire_month ]]; then
-		msg "Deleting expired backup at remote storage \n"
-		rclone delete $rclone_remote_prefix/$date_expire_month --progress
+		msg "Deleting expired backups on remote storage \n"
+		rclone delete $rclone_remote_prefix/$date_expire_month --progress > /dev/null 2>&1
 		rm -rf $dir_snap/$date_expire_month
 	fi
 	
@@ -211,11 +211,12 @@ EOF
 		echo -e "\e[31m\nThere is no input.\e[0m"
 		exit
 	fi
-	rclone_remote_prefix=$rclone_remote_name:$rclone_remote_name
-	rclone_remote_prefix_as='$rclone_remote_name:$rclone_remote_name'
-	if ! rclone lsf $rclone_remote_prefix > /dev/null 2>&1; then
-		rclone_remote_prefix=$rclone_remote_name:
-		rclone_remote_prefix_as='$rclone_remote_name:'
+	if rclone lsf $rclone_remote_name:$rclone_remote_name > /dev/null 2>&1; then
+		rclone_remote_prefix=$rclone_remote_name:$rclone_remote_name/backup
+		rclone_remote_prefix_as='$rclone_remote_name:$rclone_remote_name/backup'
+	else
+		rclone_remote_prefix=$rclone_remote_name:backup
+		rclone_remote_prefix_as='$rclone_remote_name:backup'
 	fi
 	echo ""
 	cat <<EOF
