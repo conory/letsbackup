@@ -81,8 +81,8 @@ function _backupFile
 	local _dir_file=$dir_backup_file/$1
 	local _dir_snap=$dir_snap/$date_month/$1
 	local _file_snap=$_dir_snap/$date_time.snap
-	local backup_file_name=${1//\//.}
-	backup_file_name=${backup_file_name:1}
+	local _backup_file_name=${1//\//.}
+	_backup_file_name=${_backup_file_name:1}
 	
 	# check already snap
 	if [[ -f $_file_snap ]]; then
@@ -93,14 +93,14 @@ function _backupFile
 	# making snap directory
 	if [[ ! -d $_dir_snap ]]; then
 		mkdir -p $_dir_snap
-		base=".base"
+		local _base=".base"
 	# copy previous snap
 	else
-		local previous_snap=`find $_dir_snap -maxdepth 1 -type f -name "*.snap" | sort | tail -n 1`
-		if [[ -n $previous_snap ]]; then
-			cp $previous_snap $_file_snap
+		local _previous_snap=`find $_dir_snap -maxdepth 1 -type f -name "*.snap" | sort | tail -n 1`
+		if [[ -n $_previous_snap ]]; then
+			cp $_previous_snap $_file_snap
 		else
-			base=".base"
+			local _base=".base"
 		fi
 	fi
 	
@@ -109,7 +109,7 @@ function _backupFile
 	
 	# packing
 	msg "Packing file $1 ..."
-	tar -g $_file_snap -zcf $_dir_file/$backup_file_name.$date_time$base.tgz --atime-preserve=system \
+	tar -g $_file_snap -zcf $_dir_file/$_backup_file_name.$date_time$_base.tgz --atime-preserve=system \
 		--exclude=$letsbackup_path \
 		--exclude=files/attach/chunks \
 		--exclude=files/cache \
