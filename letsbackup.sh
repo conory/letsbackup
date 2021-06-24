@@ -93,11 +93,14 @@ function _backupFile
 	# making snap directory
 	if [[ ! -d $_dir_snap ]]; then
 		mkdir -p $_dir_snap
+		base=".base"
 	# copy previous snap
 	else
 		local previous_snap=`find $_dir_snap -maxdepth 1 -type f -name "*.snap" | sort | tail -n 1`
 		if [[ -n $previous_snap ]]; then
 			cp $previous_snap $_file_snap
+		else
+			base=".base"
 		fi
 	fi
 	
@@ -106,7 +109,7 @@ function _backupFile
 	
 	# packing
 	msg "Packing file $1 ..."
-	tar -g $_file_snap -zcf $_dir_file/$backup_file_name.$date_time.tgz --atime-preserve=system \
+	tar -g $_file_snap -zcf $_dir_file/$backup_file_name.$date_time$base.tgz --atime-preserve=system \
 		--exclude=$letsbackup_path \
 		--exclude=files/attach/chunks \
 		--exclude=files/cache \
