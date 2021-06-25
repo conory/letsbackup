@@ -38,13 +38,13 @@ function backup
 
 function restore
 {
-	local local_path=$1
-	local remote_path=$2
-	local restore_path=$local_path/restore
+	local _local_path=$1
+	local _remote_path=$2
+	local _restore_path=$_local_path/restore
 	
 	# get backup files from remote storage
-	if [[ -n $remote_path ]]; then
-		if compgen -G "$local_path/*" > /dev/null; then
+	if [[ -n $_remote_path ]]; then
+		if compgen -G "$_local_path/*" > /dev/null; then
 			echo -e "\e[31mWarning: Existing files in the target path will be deleted if continue.\e[0m"
 			read -p "Y/n> " _whether
 			if [[ $_whether != "Y" ]]; then
@@ -52,24 +52,24 @@ function restore
 			fi
 		fi
 		msg "Getting backup files from remote storage. \n"
-		rm -rf $local_path && mkdir -p $local_path
-		rclone copy $rclone_remote_prefix$remote_path $local_path --progress
+		rm -rf $_local_path && mkdir -p $_local_path
+		rclone copy $rclone_remote_prefix$_remote_path $_local_path --progress
 	fi
 	
 	# check
-	local backup_files=`find $local_path -maxdepth 1 -type f -name "*.tgz" | sort`
-	if [[ -z $backup_files ]]; then
+	local _backup_files=`find $_local_path -maxdepth 1 -type f -name "*.tgz" | sort`
+	if [[ -z $_backup_files ]]; then
 		msg "\e[31mtgz backup files not exists in the target path\e[0m \n"
 		return
-	elif [[ -n $remote_path ]]; then
+	elif [[ -n $_remote_path ]]; then
 		msg "Download completed! \n"
 	fi
-	rm -rf $restore_path && mkdir -p $restore_path
+	rm -rf $_restore_path && mkdir -p $_restore_path
 	
 	# restoring
 	msg "Restoring ... \n"
-	for tgz_file in $backup_files; do
-		tar -zxGf $tgz_file -C $restore_path
+	for tgz_file in $_backup_files; do
+		tar -zxGf $tgz_file -C $_restore_path
 	done
 	
 	# end
@@ -131,13 +131,13 @@ function _backupMysql
 	fi
 	
 	# get database lists
-	database_list=`mysql $mysql_auth_option -e "SHOW DATABASES;" --skip-column-names | grep -Ev "(information_schema|performance_schema|mysql|phpmyadmin)"`
+	local _database_list=`mysql $mysql_auth_option -e "SHOW DATABASES;" --skip-column-names | grep -Ev "(information_schema|performance_schema|mysql|phpmyadmin)"`
 	if [[ $? != 0 ]]; then
 		msg "\e[31mCannot access or no database\e[0m \n"
 		return
 	fi
 	
-	for database_name in $database_list; do
+	for database_name in $_database_list; do
 		local _dir_database=$dir_backup_mysql/$database_name
 		
 		# making database directory
