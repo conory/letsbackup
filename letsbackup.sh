@@ -199,8 +199,7 @@ EOF
 		fi
 		mysql_auth_option="-h localhost -u $mysql_user -p$mysql_password"
 	fi
-	mysql $mysql_auth_option -e ""
-	if [[ $? != 0 ]]; then
+	if ! mysql $mysql_auth_option -e ""; then
 		echo -e "\e[31mmysql authentication failed.\e[0m"
 		exit
 	fi
