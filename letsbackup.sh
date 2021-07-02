@@ -20,10 +20,10 @@ function backup
 	rclone copy $dir_storage $rclone_remote_prefix --progress --transfers 1 --buffer-size 0M
 	
 	# update timestamps of working directories for prevent deleted
-	find $dir_storage/$date_month -type d | xargs touch
+	find $dir_storage/$date_month -type d | xargs -r touch
 	
 	# delete expired backup files on local storage
-	find $dir_storage -mindepth 1 -mtime +$local_expire_days | xargs rm -rf
+	find $dir_storage -mindepth 1 -mtime +$local_expire_days | xargs -r rm -rf
 	
 	# delete expired backup files on remote storage
 	if [[ -d $dir_snap/$date_expire_month ]]; then
