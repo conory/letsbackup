@@ -113,6 +113,7 @@ function _backupFile
 		--exclude=$letsbackup_path \
 		--exclude=files/attach/chunks \
 		--exclude=files/cache \
+		--exclude=files/debug \
 		--exclude=files/supercache \
 		--exclude=files/thumbnails \
 		--exclude=files/member_extra_info/experience \
