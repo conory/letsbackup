@@ -132,7 +132,7 @@ function _backupMysql
 	fi
 	
 	# get database lists
-	local _database_list=`mysql $mysql_auth_option -e "SHOW DATABASES;" --skip-column-names | grep -Ev "(information_schema|performance_schema|mysql|phpmyadmin)"`
+	local _database_list=`mysql $mysql_auth_option -e "SHOW DATABASES;" --skip-column-names | grep -Ev "(information_schema|performance_schema|mysql|phpmyadmin|sys)"`
 	if [[ $? != 0 ]]; then
 		msg "\e[31mCannot access or no database\e[0m \n"
 		return
