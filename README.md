@@ -2,7 +2,7 @@
 Web service backup script using tar incremental and rclone for remote backup. supports backup for the following:
 * /home/\<directories\>
 * /var/log
-* MySQL Databases (with mysqldump)
+* MariaDB Databases (with mariadb-dump)
 
 ## Usage
 1. install [rclone](https://github.com/ncw/rclone).

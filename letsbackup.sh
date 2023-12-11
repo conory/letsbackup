@@ -176,7 +176,7 @@ if [[ ! -f $config_file || $command == "config" ]]; then
 	cat <<EOF
 Proceed with the initial setup required for execution.
 
-Select the type of mysql authentication that will be used for mysql backup.
+Select the type of MariaDB authentication that will be used for MariaDB backup.
 1) unix socket (default)
 2) password
 EOF
@@ -191,8 +191,8 @@ EOF
 	esac
 	if [[ $mysql_auth_type == "password" ]]; then
 		echo ""
-		read -e -p "mysql user: " -i "root" mysql_user
-		read -s -p "mysql password: " mysql_password
+		read -e -p "MariaDB user: " -i "root" mysql_user
+		read -s -p "MariaDB password: " mysql_password
 		echo ""
 		if [[ -z $mysql_user ]]; then
 			echo -e "\e[31mThere is no input.\e[0m"
@@ -201,7 +201,7 @@ EOF
 		mysql_auth_option="-h localhost -u $mysql_user -p$mysql_password"
 	fi
 	if ! mariadb $mysql_auth_option -e ""; then
-		echo -e "\e[31mmysql authentication failed.\e[0m"
+		echo -e "\e[31mMariaDB authentication failed.\e[0m"
 		exit
 	fi
 	echo ""
