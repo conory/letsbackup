@@ -132,7 +132,7 @@ function _backupMysql
 	fi
 	
 	# get database lists
-	local _database_list=`mysql $mysql_auth_option -e "SHOW DATABASES;" --skip-column-names | grep -Ev "(information_schema|performance_schema|mysql|phpmyadmin|sys)"`
+	local _database_list=`mariadb $mysql_auth_option -e "SHOW DATABASES;" --skip-column-names | grep -Ev "(information_schema|performance_schema|mysql|phpmyadmin|sys)"`
 	if [[ $? != 0 ]]; then
 		msg "\e[31mCannot access or no database\e[0m \n"
 		return
@@ -146,7 +146,7 @@ function _backupMysql
 		
 		# exporting
 		msg "Exporting $database_name database to file ..."
-		mysqldump $mysql_auth_option --opt --single-transaction -e $database_name | gzip > $_dir_database/$database_name.$date_time.sql.gz
+		mariadb-dump $mysql_auth_option --opt --single-transaction -e $database_name | gzip > $_dir_database/$database_name.$date_time.sql.gz
 		msg "completed"
 	done
 }
@@ -200,7 +200,7 @@ EOF
 		fi
 		mysql_auth_option="-h localhost -u $mysql_user -p$mysql_password"
 	fi
-	if ! mysql $mysql_auth_option -e ""; then
+	if ! mariadb $mysql_auth_option -e ""; then
 		echo -e "\e[31mmysql authentication failed.\e[0m"
 		exit
 	fi
