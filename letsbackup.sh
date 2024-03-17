@@ -2,8 +2,8 @@
 function backup
 {
 	echo -e "\e[33mStart backup.\e[0m"
-	for target_path in `find /home -mindepth 1 -maxdepth 1 -type d`; do
-		_backupFile $target_path
+	for _target_path in `find /home -mindepth 1 -maxdepth 1 -type d`; do
+		_backupFile $_target_path
 	done
 	_backupFile /var/log
 	_backupMysql
@@ -64,9 +64,9 @@ function restore
 	
 	# Restoring...
 	echo -e "\e[33mRestoring...\e[0m"
-	for tgz_file in $_backup_files; do
-		echo "Unpacking $(basename $tgz_file)"
-		tar -zxGf $tgz_file -C $_restore_path
+	for _tgz_file in $_backup_files; do
+		echo "Unpacking $(basename $_tgz_file)"
+		tar -zxGf $_tgz_file -C $_restore_path
 	done
 	
 	echo -e "\e[33mCompleted.\e[0m"
@@ -133,15 +133,15 @@ function _backupMysql
 		return
 	fi
 	
-	for database_name in $_database_list; do
-		local _dir_database=$dir_backup_mysql/$database_name
+	for _database_name in $_database_list; do
+		local _dir_database=$dir_backup_mysql/$_database_name
 		
 		# Create the database directory
 		mkdir -p $_dir_database
 		
 		# Exporting the database to file ...
-		echo -en "\e[33mExporting $database_name database to file ...\e[0m"
-		mariadb-dump $mysql_auth_option --opt --single-transaction -e $database_name | gzip > $_dir_database/$database_name.$date_time.sql.gz
+		echo -en "\e[33mExporting $_database_name database to file ...\e[0m"
+		mariadb-dump $mysql_auth_option --opt --single-transaction -e $_database_name | gzip > $_dir_database/$_database_name.$date_time.sql.gz
 		echo -e "\e[32m Completed \e[0m"
 	done
 }
